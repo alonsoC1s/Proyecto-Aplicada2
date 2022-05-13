@@ -1,0 +1,12 @@
+*.csv
+*.zip
+*.pdf
+*.bak
+/indice_aire
+/mb_shp
+/mediciones_por_estacion
+stcmetro_shp/
+ste_cablebus_shp/
+ste_tren_ligero_shp/
+ste_trolebus_shp/
+
