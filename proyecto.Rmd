@@ -1,13 +1,17 @@
 ---
 title: "Proyecto"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 date: '2022-05-10'
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(lmtest)
+library(sandwich)
+library(olsrr)
 ```
 
 ## R Markdown
@@ -15,11 +19,10 @@ knitr::opts_chunk$set(echo = TRUE)
 Cargamos los datos:
 
 ```{r}
-info <- read.csv('procesados.csv')
+urlinfo <- 'https://raw.githubusercontent.com/alonsoC1s/Proyecto-Aplicada2/main/procesados.csv'
+info <- read_csv(url(urlinfo))
 info <- info[info['CONTAMINANTE'] == 'CO',]
 info <- info[-nrow(info),] #eliminamos 2020
-
-p_alcaldia <- read.csv("RAMA_CDMX_86-22_chico.csv")
 ```
 
 Graficamos el promedio de CO2 para cada año:
@@ -32,24 +35,12 @@ plot(x ,y, xlab = 'Año' , ylab = 'Promedio de CO2')
 curve(f(x) , add = TRUE)
 ```
 
-```{R}
-ggplot(data = info, mapping = aes(x = AÑO, y = MEAN_CONT)) + 
-  geom_point() + 
-  labs(
-      x="Año", y="Media de CO",
-      title="Media de CO por año"
-    )
-```
-
-Por alcaldía
-
-```{R}
-ggplot(data = p_alcaldia, mapping = aes(AÑO, VALUE, color=ALCALDIA)) + 
-  geom_point()
-```
-
-
 Podemos ver que los datos tienen una tendencia monótona decreciente, se le podría ajustar una función logaritmica, o eliminar los primero tres datos y ajustar una función lineal. Comenzaremos ajustando una función logarítmica:
+
+```{r}
+m1 <- lm(MEAN_CONT ~ log(AÑO) , data = info)
+```
+
 
 Elimienando las primeras 3 variables y ajustando una función lineal, la gráfica se ve así:
 
@@ -66,7 +57,7 @@ plot(x ,y, xlab = 'EST_V' , ylab = 'Promedio de CO2')
 curve(f(x) , add = TRUE)
 ```
 
-Si se tratara de una regresión lineal simple, deberíamos de hacer una prueba de hipótesis de "lack of fit". Sin embargo, al tener un modelo de regresión lineal simple, no es el caso. (Preguntar que es EST_V). Ahora veremos que pasa con la población.
+Si se tratara de una regresión lineal simple, deberíamos de hacer una prueba de hipótesis de "lack of fit". Sin embargo, al tener un modelo de regresión lineal múltiple, no es el caso. (Preguntar que es EST_V). Ahora veremos que pasa con la población.
 
 ```{r}
 x <- as.matrix(info['POBLACION']) / 10^6 #lo transformamos a millones de habitantes 
@@ -89,14 +80,90 @@ Los datos presentan una tendencia monótona decreciente con forma exponencial ne
 Crearemos un modelo de regresión lineal múltiple y posteriormente, con transformaciones, veremos si podemos darle un mejor ajuste al modelo. El primer model es CO = beta_0 + beta_1POB + beta_2AUT + beta_3EST__V 
 
 ```{r}
-m1 <- lm(log(MEAN_CONT) ~ log(POBLACION) + log(EST_V) + log(AUTOMOVILES), data = info)
-summary(m1)
+spec <- log(MEAN_CONT) ~ log(POBLACION) + log(EST_V) + log(AUTOMOVILES)
+m1 <- lm(spec, data = info)
+summ1 <- summary(m1)
+summ1
 ```
 
 Podemos ver que la variable EST_V no es parcialmente significativa. Asimismo, la $R^2$ es bastante alta dado el problema. AHora obtendremos un modelo con Forward Stepwise.
 
+```{r}
+#Dijo que no debemos hacer este porque eliminaría a EST_V
+```
+
+## A Partir de Aqui meter al documento.
+
+La para probar Heterocedasticidad se usa la prueba Breusch-Pagan.
+Esta prueba usa de hipótesis nulla: $H_{0}: \text{Hay homocedasticidad presente en el modelo (los residuales se distribuyen con la misma varianza)}$ vs $H_{a}: \text{Los residuales se dsitribuyen con varianzas distintas, es decir hay heterocedasticidad en modelo}$
+```{r, echo=F}
+bpm1 <- bptest(m1)
+bpm1$p.value
+```
+
+El p-value de la prueba Breusch-Pagan es `r bpm1$p.value`. Es decir como es menor a los niveles aceptables de significancia se rechaza la hipótesis nula. Por lo tante se puede concluir que el modelo presenta heterocedasticidad. Por ello se buscará hacer un modelo más robusto corrigiendo esto. 
 
 
+Ahora para además se uso la prueba White para corroborar lo anterior y el resultado es el siguiente.
+
+```{r, echo=F}
+whitem1 <- bptest(m1, ~ POBLACION*AUTOMOVILES*EST_V + I(POBLACION^2) + I(AUTOMOVILES^2) + I(EST_V^2), data = info)
+whitem1
+whitem1$p.value
+```
+
+Es importante notar que la heterocedasticidad si está presente en el modelo ya que el p-value, `r whitem1$p.value`, está por debajo de los niveles de signifincia aceptados (es decir es menor al 5% o 10%). 
+
+Para corregir la heterocedasticidad se hará el cálculo de "heteroskedasticity-robust standard errors" con el tipo HC1. La matriz de coviaranza robusta (mejorada) de las variables es la siguiente: 
+```{r, echo=F}
+vcov <- vcovHC(m1, type = "HC1")
+robust_se <- sqrt(diag(vcov))
+vcov
+```
+Con ello también se puede ver que las desviaciones estandar (robustas) de las variables es la siguiente:
+
+```{r}
+robust_se
+```
+
+Por último con esta matriz de covarianzas robusta se puede calcular como quedarían las estimaciones del modelo:
+
+```{r}
+coeftest(m1, vcov. = vcov)
+```
+Se puede ver de manera clara que la variable del número de estaciones de transporte verde continua siendo no significativa. 
 
 
+Se usó el siguiente correlograma para observar si el modelo puede tener autocorrelación: 
+```{r}
+### NO ENTENDI COMO LEER ESTO
+res <- m1$residuals
+acf(res,main='Función de autocorrelación de residuales')
+```
+
+La prueba que se usó para detectar al autocorrelación es la Breusch-Godfrey. En ella la hipótesis nula es $H_{0}: No autocorrelación$ y los resultados son los siguientes
+```{r}
+#CHECAR ESTO PORQUE ES RARO QUE NO HAYA AUTOCORRELACIÓN
+bgm1 <- bgtest(m1, order=1)
+bgm1
+```
+
+El p-value es el siguiente: `r bgm1$p.value` es mayor a un nivel de significancia del 10% por lo que no se rechaza $H_{0}$, es decir no hay autocorrelación. 
+
+
+Por último se probará por multicolinealidad con el uso del índice de condición, este es el siguiente para el modelo: 
+```{r}
+ols_eigen_cindex(m1)
+```
+
+Se puede observar que (se requiere que dos o más variables tengan un condition index mayor a 30, no entendí como leer esto pero 
+
+
+Además podemos observar que el Factor de Inflación de la Varianza (FIV) es el siguiente: 
+
+```{r}
+ols_vif_tol(m1)
+
+ols_coll_diag(m1)
+```
 

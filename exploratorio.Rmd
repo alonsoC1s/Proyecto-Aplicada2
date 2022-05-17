@@ -13,9 +13,14 @@ output: revealjs::revealjs_presentation
 # Análisis exploratorio
 
 ```{r, echo=FALSE}
-library("ggplot2")
-library("dplyr")
-library("nlme")
+library(ggplot2)
+library(dplyr)
+library(nlme)
+library(lmtest)
+library(sandwich)
+library(olsrr)
+library(corrplot)
+library(dplyr)
 
 info <- read.csv('procesados.csv')
 info <- info[info['CONTAMINANTE'] == 'CO',]
@@ -83,18 +88,124 @@ ggplot(data=info, mapping = aes(AÑO, MEAN_CONT)) +
 ```
 
 
-## Pruebas de hipótesis
+# Pruebas de hipótesis
+```{R}
+spec <- log(MEAN_CONT) ~ log(POBLACION) + log(EST_V) + log(AUTOMOVILES)
+m_ols <- lm(spec, data=info)
+summary(m_ols)
+```
+La para probar Heterocedasticidad se usa la prueba Breusch--Pagan. Esta prueba
+usa de hipótesis nula: $H_{0}:$ Hay homocedasticidad presente en el modelo (los
+residuales se distribuyen con la misma varianza) _vs_ $H_{a}:$ Los residuales se
+dsitribuyen con varianzas distintas, es decir hay heterocedasticidad en modelo.
+
+```{r, echo=FALSE}
+bpm1 <- bptest(m_ols)
+bpm1$p.value
+```
+
+Para esta prueba estadística usamos la función `bptest`. El $p$-value de la
+prueba Breusch--Pagan es `r bpm1$p.value`.
+<!-- El párrafo de abjo podría estar mal -->
+Es decir como es menor a los niveles
+aceptables de significancia se rechaza la hipótesis nula. Por lo tante se puede
+concluir que el modelo presenta heterocedasticidad. Por ello se buscará hacer un
+modelo más robusto corrigiendo esto. 
+
+
+Ahora para además se uso la prueba White para corroborar lo anterior y el resultado es el siguiente.
+
+```{r, echo=F}
+whitem1 <- bptest(m_ols, ~ POBLACION*AUTOMOVILES*EST_V + I(POBLACION^2) + I(AUTOMOVILES^2) + I(EST_V^2), data = info)
+whitem1
+whitem1$p.value
+```
+
+Es importante notar que la heterocedasticidad si está presente en el modelo ya que el $p$-value, `r whitem1$p.value`, está por debajo de los niveles de signifincia aceptados (es decir es menor al 5% o 10%). 
+
+Para corregir la heterocedasticidad se hará el cálculo de "heteroskedasticity-robust standard errors" con el tipo HC1. La matriz de coviaranza robusta (mejorada) de las variables es la siguiente: 
+```{r, echo=F}
+vcov <- vcovHC(m_ols, type = "HC1")
+robust_se <- sqrt(diag(vcov))
+vcov
+```
+Con ello también se puede ver que las desviaciones estandar (robustas) de las variables es la siguiente:
+
+```{r}
+robust_se
+```
+
+Por último con esta matriz de covarianzas robusta se puede calcular como quedarían las estimaciones del modelo:
+
+```{r}
+coeftest(m_ols, vcov. = vcov)
+```
+Se puede ver de manera clara que la variable del número de estaciones de transporte verde continua siendo no significativa. 
+
+
+Se usó el siguiente correlograma para observar si el modelo puede tener autocorrelación: 
+```{r}
+### NO ENTENDI COMO LEER ESTO
+res <- m_ols$residuals
+acf(res,main='Función de autocorrelación de residuales')
+```
+
+La prueba que se usó para detectar al autocorrelación es la Breusch-Godfrey. En
+ella la hipótesis nula es $H_{0}: No autocorrelación$ y los resultados son los
+siguientes
+```{r}
+#CHECAR ESTO PORQUE ES RARO QUE NO HAYA AUTOCORRELACIÓN
+bgm1 <- bgtest(m_ols, order=5)
+bgm1
+```
+
+El p-value es el siguiente: `r bgm1$p.value` es mayor a un nivel de significancia del 10% por lo que no se rechaza $H_{0}$, es decir no hay autocorrelación. 
+
+
+Por último se probará por multicolinealidad con el uso del índice de condición, este es el siguiente para el modelo: 
+```{r}
+ols_eigen_cindex(m_ols)
+```
+
+Se puede observar que (se requiere que dos o más variables tengan un condition index mayor a 30, no entendí como leer esto pero 
+
+
+Además podemos observar que el Factor de Inflación de la Varianza (FIV) es el siguiente: 
+
+```{r}
+ols_vif_tol(m_ols)
+
+ols_coll_diag(m_ols)
+```
+
+Usamos una gráfica de correlacion entre variables para ver cuales variables
+podrían estar causando la multicolinealidad
+
+```{R, echo=FALSE}
+info |>
+    dplyr::select_if(is.numeric) |>
+    dplyr::select(-AÑO) |>
+    cor() |> corrplot(method="ellipse")
+```
+
+Podemos ver que la cantidad de automóviles y la Población están áltamente
+correlacionados. Estas variables podrían ser (en conjunto) las responsables del
+problema grave de multicolinealidad que observamos. Para arreglarlo nos
+deshacemos de la variable de población. Simplemente porque tiene más sentido
+mantener en el modelo la cantidad de automóviles, porque son las fuentes de
+contaminación.
+
 
 # Especificación del modelo de regresión
 
 $$
-\ln(\text{CO}_{t}) = \beta_0 + \beta_1 \ln(\text{POBLACION}_{t}) + \beta_2 \ln(\text{EST\_V}_{t})  + \beta_3 \ln(\text{AUTOMOVILES}_{t})
+\ln(\text{CO}_{t}) = \beta_0 + \beta_1 \ln(\text{EST\_V}_{t})  + \beta_2 \ln(\text{AUTOMOVILES}_{t})
 $$
 
 En R lo espcificamos así:
 
 ```{R}
-spec <- log(MEAN_CONT) ~ log(POBLACION) + log(EST_V) + log(AUTOMOVILES)
+spec <- log(MEAN_CONT) ~ log(EST_V) + log(AUTOMOVILES)
 ```
 
 
@@ -105,15 +216,6 @@ spec <- log(MEAN_CONT) ~ log(POBLACION) + log(EST_V) + log(AUTOMOVILES)
 m_ols <- lm(spec, data=info)
 summary(m_ols)
 ```
-
-## Estimación GLS
-Uso el paquete `nlme`.
-
-```{R}
-m_gls <- gls(spec, data=info)
-summary(m_gls)
-```
-
 
 ## Resultados
 La estimación es idéntica, pero se ve que si hay correlaciones entre variables por la matriz de correlaciones.
