@@ -116,7 +116,7 @@ modelo más robusto corrigiendo esto.
 Ahora para además se uso la prueba White para corroborar lo anterior y el resultado es el siguiente.
 
 ```{r, echo=F}
-whitem1 <- bptest(m_ols, ~ POBLACION*AUTOMOVILES*EST_V + I(POBLACION^2) + I(AUTOMOVILES^2) + I(EST_V^2), data = info)
+whitem1 <- bptest(m_ols, ~ log(POBLACION)*log(AUTOMOVILES)*log(EST_V) + I(log(POBLACION)^2) + I(log(AUTOMOVILES)^2) + I(log(EST_V)^2), data = info)
 whitem1
 whitem1$p.value
 ```
