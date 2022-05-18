@@ -31,7 +31,7 @@ info <- info[-nrow(info),] #eliminamos 2020
 ```{R, echo=FALSE}
 ggplot(data=info, mapping = aes(AÑO, MEAN_CONT)) +
     geom_point() +
-    geom_smooth() + 
+    geom_smooth(method = "lm") + 
     labs(
         x = "Año", y = "Media anual de CO"
     )
@@ -42,7 +42,7 @@ ggplot(data=info, mapping = aes(AÑO, MEAN_CONT)) +
 ```{R, echo=FALSE}
 ggplot(data=info, mapping = aes(AÑO, AUTOMOVILES)) +
     geom_point() +
-    geom_smooth() + 
+    geom_smooth(method = "lm") + 
     labs(
         x = "Año", y = "Número de automóviles registrados"
     )
@@ -53,7 +53,7 @@ ggplot(data=info, mapping = aes(AÑO, AUTOMOVILES)) +
 ```{R, echo=FALSE}
 ggplot(data=info, mapping = aes(AÑO, POBLACION / 1e6)) +
     geom_point() +
-    geom_smooth() + 
+    geom_smooth(method = "lm") + 
     labs(
         x = "Año", y = "Población en millones"
     )
@@ -63,7 +63,7 @@ ggplot(data=info, mapping = aes(AÑO, POBLACION / 1e6)) +
 ```{R, echo=FALSE}
 ggplot(data=info, mapping = aes(AÑO,  EST_V)) +
     geom_point() +
-    geom_smooth() + 
+    geom_smooth(method = "lm") + 
     labs(
         x = "Año", y = "Estaciones de transporte público eléctrico"
     )
@@ -81,7 +81,7 @@ info <- info |>
 ```{R, echo=FALSE}
 ggplot(data=info, mapping = aes(AÑO, MEAN_CONT)) +
     geom_point() +
-    geom_smooth() + 
+    geom_smooth(method = "lm") + 
     labs(
         x = "Año", y = "Media anual de CO"
     )
@@ -89,19 +89,21 @@ ggplot(data=info, mapping = aes(AÑO, MEAN_CONT)) +
 
 
 # Pruebas de hipótesis
-```{R}
+```{R, echo=FALSE, results="asis"}
 spec <- log(MEAN_CONT) ~ log(POBLACION) + log(EST_V) + log(AUTOMOVILES)
 m_ols <- lm(spec, data=info)
-summary(m_ols)
+stargazer(m_ols, align=TRUE, ci=TRUE, no.space=TRUE,
+    single.row=TRUE,
+    title="Parámetros estimados para el modelo lineal en \\eqref{eq:spec-malo}."
+    )
 ```
 La para probar Heterocedasticidad se usa la prueba Breusch--Pagan. Esta prueba
 usa de hipótesis nula: $H_{0}:$ Hay homocedasticidad presente en el modelo (los
 residuales se distribuyen con la misma varianza) _vs_ $H_{a}:$ Los residuales se
 dsitribuyen con varianzas distintas, es decir hay heterocedasticidad en modelo.
 
-```{r, echo=FALSE}
+```{R, echo=FALSE}
 bpm1 <- bptest(m_ols)
-bpm1$p.value
 ```
 
 Para esta prueba estadística usamos la función `bptest`. El $p$-value de la
@@ -115,36 +117,46 @@ modelo más robusto corrigiendo esto.
 
 Ahora para además se uso la prueba White para corroborar lo anterior y el resultado es el siguiente.
 
-```{r, echo=F}
+```{R, echo=FALSE}
 whitem1 <- bptest(m_ols, ~ log(POBLACION)*log(AUTOMOVILES)*log(EST_V) + I(log(POBLACION)^2) + I(log(AUTOMOVILES)^2) + I(log(EST_V)^2), data = info)
-whitem1
-whitem1$p.value
 ```
 
 Es importante notar que la heterocedasticidad si está presente en el modelo ya que el $p$-value, `r whitem1$p.value`, está por debajo de los niveles de signifincia aceptados (es decir es menor al 5% o 10%). 
 
 Para corregir la heterocedasticidad se hará el cálculo de "heteroskedasticity-robust standard errors" con el tipo HC1. La matriz de coviaranza robusta (mejorada) de las variables es la siguiente: 
-```{r, echo=F}
+```{R, echo=FALSE, results="asis"}
 vcov <- vcovHC(m_ols, type = "HC1")
 robust_se <- sqrt(diag(vcov))
-vcov
+vcov |> stargazer(align=TRUE, ci=TRUE,
+    no.space=TRUE,
+    single.row=TRUE,
+    title="Matriz de covarianza robusta para las variables presentadas."
+)
 ```
 Con ello también se puede ver que las desviaciones estandar (robustas) de las variables es la siguiente:
 
-```{r}
-robust_se
+```{R, echo=FALSE, results="asis"}
+robust_se |> stargazer(align=TRUE, ci=TRUE,
+    no.space=TRUE,
+    single.row=TRUE,
+    title="Desviaciones estándar robustas para las variables presentadas."
+)
 ```
 
 Por último con esta matriz de covarianzas robusta se puede calcular como quedarían las estimaciones del modelo:
 
-```{r}
-coeftest(m_ols, vcov. = vcov)
+```{R, echo=FALSE, results="asis"}
+coeftest(m_ols, vcov. = vcov) |> stargazer(align=TRUE,
+    ci=TRUE,
+    no.space=TRUE,
+    single.row=TRUE,
+    title="Estimadores del modelo calculados con las covarianzas robustas"
+)
 ```
-Se puede ver de manera clara que la variable del número de estaciones de transporte verde continua siendo no significativa. 
-
+Se puede ver de manera clara que la variable del número de estaciones de transporte verde continua siendo no significativa, lo cual es de esperarse ya que el modelo original no presenta problemas de heterocedasticidad ni autocorrelación. Como no tiene estos problemas, estas "correcciones" no corrijen nada en realidad.
 
 Se usó el siguiente correlograma para observar si el modelo puede tener autocorrelación: 
-```{r}
+```{r, echo=FALSE}
 ### NO ENTENDI COMO LEER ESTO
 res <- m_ols$residuals
 acf(res,main='Función de autocorrelación de residuales')
@@ -153,18 +165,21 @@ acf(res,main='Función de autocorrelación de residuales')
 La prueba que se usó para detectar al autocorrelación es la Breusch-Godfrey. En
 ella la hipótesis nula es $H_{0}: No autocorrelación$ y los resultados son los
 siguientes
-```{r}
+```{r, echo=FALSE}
 #CHECAR ESTO PORQUE ES RARO QUE NO HAYA AUTOCORRELACIÓN
 bgm1 <- bgtest(m_ols, order=5)
-bgm1
 ```
 
 El p-value es el siguiente: `r bgm1$p.value` es mayor a un nivel de significancia del 10% por lo que no se rechaza $H_{0}$, es decir no hay autocorrelación. 
 
-
 Por último se probará por multicolinealidad con el uso del índice de condición, este es el siguiente para el modelo: 
-```{r}
-ols_eigen_cindex(m_ols)
+```{R, echo=FALSE, results="asis"}
+ols_eigen_cindex(m_ols) |> stargazer(align=TRUE,
+    ci=TRUE,
+    no.space=TRUE,
+    single.row=TRUE,
+    title="Números de condición para la matriz de datos."
+)
 ```
 
 Se puede observar que (se requiere que dos o más variables tengan un condition index mayor a 30, no entendí como leer esto pero 
@@ -172,10 +187,16 @@ Se puede observar que (se requiere que dos o más variables tengan un condition 
 
 Además podemos observar que el Factor de Inflación de la Varianza (FIV) es el siguiente: 
 
-```{r}
-ols_vif_tol(m_ols)
+```{R, echo=FALSE, results="asis"}
+ols_vif_tol(m_ols) |> stargazer(align=TRUE, ci=TRUE)
+```
 
-ols_coll_diag(m_ols)
+```{R, echo=FALSE, results="asis"}
+ols_coll_diag(m_ols) |> stargazer(align=TRUE, ci=TRUE,
+    no.space=TRUE,
+    single.row=TRUE,
+    title="Tabla de factores de inflación de la varianza."
+)
 ```
 
 Usamos una gráfica de correlacion entre variables para ver cuales variables
@@ -185,7 +206,7 @@ podrían estar causando la multicolinealidad
 info |>
     dplyr::select_if(is.numeric) |>
     dplyr::select(-AÑO) |>
-    cor() |> corrplot(method="ellipse")
+    cor() |> corrplot(method="ellipse", tl.pos="d", tl.cex=0.75)
 ```
 
 Podemos ver que la cantidad de automóviles y la Población están áltamente
@@ -212,9 +233,13 @@ spec <- log(MEAN_CONT) ~ log(EST_V) + log(AUTOMOVILES)
 # Estimación del modelo 
 
 ## Estimación OLS
-```{R}
+```{R, echo=FALSE, results="asis"}
 m_ols <- lm(spec, data=info)
-summary(m_ols)
+m_ols |> stargazer(align=TRUE, ci=TRUE,
+    no.space=TRUE,
+    single.row=TRUE,
+    title="Estimación del modelo modificado para eliminar multicolinealidad."
+)
 ```
 
 ## Resultados

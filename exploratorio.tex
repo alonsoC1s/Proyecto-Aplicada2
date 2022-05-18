@@ -1,0 +1,443 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Exploración de variables y el modelo.},
+  pdfauthor={Alonso Martinez; Enrique Ampudia; Ana Tena; Rodrigo Peralta; Cecilia Ramirez},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Exploración de variables y el modelo.}
+\author{Alonso Martinez \and Enrique Ampudia \and Ana Tena \and Rodrigo
+Peralta \and Cecilia Ramirez}
+\date{2022-05-10}
+
+\begin{document}
+\maketitle
+
+\hypertarget{anuxe1lisis-exploratorio}{%
+\section{Análisis exploratorio}\label{anuxe1lisis-exploratorio}}
+
+\hypertarget{autos-promedio-de-co-a-travuxe9s-del-tiempo.}{%
+\subsection{Autos \& promedio de CO a través del
+tiempo.}\label{autos-promedio-de-co-a-travuxe9s-del-tiempo.}}
+
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
+
+\includegraphics{exploratorio_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+\hypertarget{autos-promedio-de-co-a-travuxe9s-del-tiempo.-1}{%
+\subsection{Autos \& promedio de CO a través del
+tiempo.}\label{autos-promedio-de-co-a-travuxe9s-del-tiempo.-1}}
+
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
+
+\includegraphics{exploratorio_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\hypertarget{autos-promedio-de-co-a-travuxe9s-del-tiempo.-2}{%
+\subsection{Autos \& promedio de CO a través del
+tiempo.}\label{autos-promedio-de-co-a-travuxe9s-del-tiempo.-2}}
+
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
+
+\includegraphics{exploratorio_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\hypertarget{nuxfamero-de-estaciones-de-de-transporte-puxfablico-eluxe9ctrico-a-travuxe9s-del-tiempo}{%
+\subsection{Número de estaciones de de transporte público eléctrico a
+través del
+tiempo}\label{nuxfamero-de-estaciones-de-de-transporte-puxfablico-eluxe9ctrico-a-travuxe9s-del-tiempo}}
+
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
+
+\includegraphics{exploratorio_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\hypertarget{dado-lo-observado-quitamos-los-datos-antes-del-1993}{%
+\subsection{Dado lo observado quitamos los datos antes del
+1993}\label{dado-lo-observado-quitamos-los-datos-antes-del-1993}}
+
+\hypertarget{autos-promedio-de-co-a-travuxe9s-del-tiempo-con-el-arreglo}{%
+\subsection{Autos \& promedio de CO a través del tiempo con el
+arreglo}\label{autos-promedio-de-co-a-travuxe9s-del-tiempo-con-el-arreglo}}
+
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
+
+\includegraphics{exploratorio_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\hypertarget{pruebas-de-hipuxf3tesis}{%
+\section{Pruebas de hipótesis}\label{pruebas-de-hipuxf3tesis}}
+
+\% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy
+Institute. E-mail: marek.hlavac at gmail.com \% Date and time: Tue, May
+17, 2022 - 07:34:55 PM \% Requires LaTeX packages: dcolumn
+
+\begin{table}[!htbp] \centering 
+  \caption{Parámetros estimados para el modelo lineal en \eqref{eq:spec-malo}.} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{1}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-2} 
+\\[-1.8ex] & \multicolumn{1}{c}{log(MEAN\_CONT)} \\ 
+\hline \\[-1.8ex] 
+ log(POBLACION) & -27.397^{***}$ $(-33.895$, $-20.898) \\ 
+  log(EST\_V) & 0.995^{*}$ $(-0.010$, $2.000) \\ 
+  log(AUTOMOVILES) & -0.166$ $(-0.485$, $0.153) \\ 
+  Constant & 435.315^{***}$ $(338.000$, $532.630) \\ 
+ \hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{25} \\ 
+R$^{2}$ & \multicolumn{1}{c}{0.981} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.979} \\ 
+Residual Std. Error & \multicolumn{1}{c}{0.084 (df = 21)} \\ 
+F Statistic & \multicolumn{1}{c}{365.822$^{***}$ (df = 3; 21)} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table}
+
+La para probar Heterocedasticidad se usa la prueba Breusch--Pagan. Esta
+prueba usa de hipótesis nula: \(H_{0}:\) Hay homocedasticidad presente
+en el modelo (los residuales se distribuyen con la misma varianza)
+\emph{vs} \(H_{a}:\) Los residuales se dsitribuyen con varianzas
+distintas, es decir hay heterocedasticidad en modelo.
+
+Para esta prueba estadística usamos la función \texttt{bptest}. El
+\(p\)-value de la prueba Breusch--Pagan es 0.194183. Es decir como es
+menor a los niveles aceptables de significancia se rechaza la hipótesis
+nula. Por lo tante se puede concluir que el modelo presenta
+heterocedasticidad. Por ello se buscará hacer un modelo más robusto
+corrigiendo esto.
+
+Ahora para además se uso la prueba White para corroborar lo anterior y
+el resultado es el siguiente.
+
+Es importante notar que la heterocedasticidad si está presente en el
+modelo ya que el \(p\)-value, 0.2444776, está por debajo de los niveles
+de signifincia aceptados (es decir es menor al 5\% o 10\%).
+
+Para corregir la heterocedasticidad se hará el cálculo de
+``heteroskedasticity-robust standard errors'' con el tipo HC1. La matriz
+de coviaranza robusta (mejorada) de las variables es la siguiente:
+
+\% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy
+Institute. E-mail: marek.hlavac at gmail.com \% Date and time: Tue, May
+17, 2022 - 07:34:55 PM \% Requires LaTeX packages: dcolumn
+
+\begin{table}[!htbp] \centering 
+  \caption{Matriz de covarianza robusta para las variables presentadas.} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{(Intercept)} & \multicolumn{1}{c}{log(POBLACION)} & \multicolumn{1}{c}{log(EST\_V)} & \multicolumn{1}{c}{log(AUTOMOVILES)} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{1}{c}{(Intercept)} & 1,268.118 & -83.003 & 0.704 & 3.692 \\ 
+\multicolumn{1}{c}{log(POBLACION)} & -83.003 & 5.442 & -0.087 & -0.237 \\ 
+\multicolumn{1}{c}{log(EST\_V)} & 0.704 & -0.087 & 0.216 & -0.031 \\ 
+\multicolumn{1}{c}{log(AUTOMOVILES)} & 3.692 & -0.237 & -0.031 & 0.017 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table}
+
+Con ello también se puede ver que las desviaciones estandar (robustas)
+de las variables es la siguiente:
+
+\% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy
+Institute. E-mail: marek.hlavac at gmail.com \% Date and time: Tue, May
+17, 2022 - 07:34:55 PM \% Requires LaTeX packages: dcolumn
+
+\begin{table}[!htbp] \centering 
+  \caption{Desviaciones estándar robustas para las variables presentadas.} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\multicolumn{1}{c}{(Intercept)} & \multicolumn{1}{c}{log(POBLACION)} & \multicolumn{1}{c}{log(EST\_V)} & \multicolumn{1}{c}{log(AUTOMOVILES)} \\ 
+\hline \\[-1.8ex] 
+35.611 & 2.333 & 0.465 & 0.132 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table}
+
+Por último con esta matriz de covarianzas robusta se puede calcular como
+quedarían las estimaciones del modelo:
+
+\% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy
+Institute. E-mail: marek.hlavac at gmail.com \% Date and time: Tue, May
+17, 2022 - 07:34:55 PM \% Requires LaTeX packages: dcolumn
+
+\begin{table}[!htbp] \centering 
+  \caption{Estimadores del modelo calculados con las covarianzas robustas} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{1}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-2} 
+\\[-1.8ex] & \multicolumn{1}{c}{ } \\ 
+\hline \\[-1.8ex] 
+ log(POBLACION) & -27.397^{***}$ $(-31.969$, $-22.825) \\ 
+  log(EST\_V) & 0.995^{**}$ $(0.083$, $1.906) \\ 
+  log(AUTOMOVILES) & -0.166$ $(-0.424$, $0.092) \\ 
+  Constant & 435.315^{***}$ $(365.520$, $505.111) \\ 
+ \hline \\[-1.8ex] 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table}
+
+Se puede ver de manera clara que la variable del número de estaciones de
+transporte verde continua siendo no significativa, lo cual es de
+esperarse ya que el modelo original no presenta problemas de
+heterocedasticidad ni autocorrelación. Como no tiene estos problemas,
+estas ``correcciones'' no corrijen nada en realidad.
+
+Se usó el siguiente correlograma para observar si el modelo puede tener
+autocorrelación:
+\includegraphics{exploratorio_files/figure-latex/unnamed-chunk-14-1.pdf}
+
+La prueba que se usó para detectar al autocorrelación es la
+Breusch-Godfrey. En ella la hipótesis nula es
+\(H_{0}: No autocorrelación\) y los resultados son los siguientes
+
+El p-value es el siguiente: 0.4755028 es mayor a un nivel de
+significancia del 10\% por lo que no se rechaza \(H_{0}\), es decir no
+hay autocorrelación.
+
+Por último se probará por multicolinealidad con el uso del índice de
+condición, este es el siguiente para el modelo:
+
+\% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy
+Institute. E-mail: marek.hlavac at gmail.com \% Date and time: Tue, May
+17, 2022 - 07:34:55 PM \% Requires LaTeX packages: dcolumn
+
+\begin{table}[!htbp] \centering 
+  \caption{Números de condición para la matriz de datos.} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+Eigenvalue & 4 & 1.000 & 2.000 & 0.00000 & 4.000 \\ 
+Condition Index & 4 & 2,267.241 & 4,248.640 & 1.000 & 8,636.882 \\ 
+intercept & 4 & 0.250 & 0.500 & 0.000 & 1.000 \\ 
+log(POBLACION) & 4 & 0.250 & 0.500 & 0.000 & 1.000 \\ 
+log(EST\_V) & 4 & 0.250 & 0.361 & 0.00000 & 0.767 \\ 
+log(AUTOMOVILES) & 4 & 0.250 & 0.321 & 0.00000 & 0.712 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table}
+
+Se puede observar que (se requiere que dos o más variables tengan un
+condition index mayor a 30, no entendí como leer esto pero
+
+Además podemos observar que el Factor de Inflación de la Varianza (FIV)
+es el siguiente:
+
+\% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy
+Institute. E-mail: marek.hlavac at gmail.com \% Date and time: Tue, May
+17, 2022 - 07:34:55 PM \% Requires LaTeX packages: dcolumn
+
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+Tolerance & 3 & 0.117 & 0.080 & 0.061 & 0.208 \\ 
+VIF & 3 & 11.178 & 5.859 & 4.805 & 16.332 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table}
+
+\% Error: Unrecognized object type.
+
+Usamos una gráfica de correlacion entre variables para ver cuales
+variables podrían estar causando la multicolinealidad
+
+\includegraphics{exploratorio_files/figure-latex/unnamed-chunk-19-1.pdf}
+
+Podemos ver que la cantidad de automóviles y la Población están
+áltamente correlacionados. Estas variables podrían ser (en conjunto) las
+responsables del problema grave de multicolinealidad que observamos.
+Para arreglarlo nos deshacemos de la variable de población. Simplemente
+porque tiene más sentido mantener en el modelo la cantidad de
+automóviles, porque son las fuentes de contaminación.
+
+\hypertarget{especificaciuxf3n-del-modelo-de-regresiuxf3n}{%
+\section{Especificación del modelo de
+regresión}\label{especificaciuxf3n-del-modelo-de-regresiuxf3n}}
+
+\[
+\ln(\text{CO}_{t}) = \beta_0 + \beta_1 \ln(\text{EST\_V}_{t})  + \beta_2 \ln(\text{AUTOMOVILES}_{t})
+\]
+
+En R lo espcificamos así:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{spec }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(MEAN\_CONT) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{log}\NormalTok{(EST\_V) }\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(AUTOMOVILES)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{estimaciuxf3n-del-modelo}{%
+\section{Estimación del modelo}\label{estimaciuxf3n-del-modelo}}
+
+\hypertarget{estimaciuxf3n-ols}{%
+\subsection{Estimación OLS}\label{estimaciuxf3n-ols}}
+
+\% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy
+Institute. E-mail: marek.hlavac at gmail.com \% Date and time: Tue, May
+17, 2022 - 07:34:55 PM \% Requires LaTeX packages: dcolumn
+
+\begin{table}[!htbp] \centering 
+  \caption{Estimación del modelo modificado para eliminar multicolinealidad.} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{1}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-2} 
+\\[-1.8ex] & \multicolumn{1}{c}{log(MEAN\_CONT)} \\ 
+\hline \\[-1.8ex] 
+ log(EST\_V) & -1.085$ $(-2.849$, $0.678) \\ 
+  log(AUTOMOVILES) & -1.296^{***}$ $(-1.644$, $-0.947) \\ 
+  Constant & 25.199^{***}$ $(19.627$, $30.772) \\ 
+ \hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{25} \\ 
+R$^{2}$ & \multicolumn{1}{c}{0.920} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.913} \\ 
+Residual Std. Error & \multicolumn{1}{c}{0.169 (df = 22)} \\ 
+F Statistic & \multicolumn{1}{c}{126.802$^{***}$ (df = 2; 22)} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table}
+
+\hypertarget{resultados}{%
+\subsection{Resultados}\label{resultados}}
+
+La estimación es idéntica, pero se ve que si hay correlaciones entre
+variables por la matriz de correlaciones.
+
+\begin{itemize}
+\tightlist
+\item
+  Está bien hecho?
+\item
+  Son malas noticias?
+\end{itemize}
+
+\end{document}
